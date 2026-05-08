@@ -1,3 +1,5 @@
+print(game:HttpGet("https://raw.githubusercontent.com/dragoncihuyhub/DragonCihuyHuB/refs/heads/main/DragonCihuy_AutoFarm.lua"))
+
 -- BUILD A BOAT AUTO FARM - DRAGON CIHUY (TOP CENTER OPEN VERSION)
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
