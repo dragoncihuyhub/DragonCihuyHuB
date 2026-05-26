@@ -191,6 +191,48 @@ TabMisc:CreateSlider({
       hitboxSize = Value
    end,
 })
+TabMisc:CreateSection("Noclip")
+local noclipEnabled = false
+local noclipConnection
+local hook = newcclosure(function() return end)
+for _, obj in getgc(false) do 
+   if typeof(obj) == "function" then 
+      local source = debug.info(obj, "s")
+      if source and source:find("CharacterCollision") then 
+         hookfunction(obj, hook)
+      end
+   end
+end
+TabMisc:CreateToggle({
+   Name = "NOCLIP",
+   CurrentValue = false,
+   Flag = "Noclip_Toggle",
+   Callback = function(Value)
+      noclipEnabled = Value
+      if noclipEnabled then
+         noclipConnection = game:GetService("RunService").Stepped:Connect(function()
+            if noclipEnabled and game.Players.LocalPlayer.Character then
+               for _, v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+                  if v:IsA("BasePart") and v.CanCollide then
+                     v.CanCollide = false
+                  end
+               end
+            end
+         end)
+      else
+         if noclipConnection then
+            noclipConnection:Disconnect()
+         end
+         if game.Players.LocalPlayer.Character then
+            for _, v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+               if v:IsA("BasePart") then
+                  v.CanCollide = true
+               end
+            end
+         end
+      end
+   end,
+})
 TabMisc:CreateSection("Infjump")
 local infJumpConnection
 TabMisc:CreateToggle({
