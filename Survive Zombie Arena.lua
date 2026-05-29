@@ -1,317 +1,394 @@
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-local Window = Rayfield:CreateWindow({
-	Name = "DragonCihuy Hub | Survive Zombie Arena",
-	LoadingTitle = "DragonCihuy Hub",
-	LoadingSubtitle = "by DragonCihuy",
-	ConfigurationSaving = {Enabled = false},
-	Discord = {Enabled = false, Invite = ""},
-	KeySystem = false
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/dist/main.lua"))()
+local Window = WindUI:CreateWindow({
+    Title = "DragonCihuy Hub | SZA",
+    Icon = "star",
+    Author = "DragonCihuy",
+    Folder = "DragonCihuyHub",
+    Size = UDim2.fromOffset(240, 425),
+    Transparent = true,
+    Theme = "Dark",
+    SideBarWidth = 120,
 })
-
-local MainTab = Window:CreateTab("Main")
-local MiscTab = Window:CreateTab("Misc")
-local LPTab = Window:CreateTab("Local Player")
-local DiscTab = Window:CreateTab("Discord")
-
-local P = game:GetService("Players")
-local R = game:GetService("ReplicatedStorage")
-local L = P.LocalPlayer
-local VU = game:GetService("VirtualUser")
-local LP = game:GetService("Lighting")
-
-local FarmActive = false
-local FastCleanActive = false
-local TakutActive = false
-local AntiAfkActive = false
-local NoclipActive = false
-local InfJumpActive = false
-local WalkActive = false
-local JumpActive = false
-local WSValue = 16
-local JPValue = 50
-
-local function H()
-	local M = L.Character and L.Character:FindFirstChildOfClass("Humanoid")
-	if M and FarmActive then M.HipHeight = 25 end
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Lighting = game:GetService("Lighting")
+local RunService = game:GetService("RunService")
+local VirtualUser = game:GetService("VirtualUser")
+local UIS = game:GetService("UserInputService")
+local StarterGui = game:GetService("StarterGui")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+local Home = Window:Tab({
+    Title = "• Home",
+})
+Home:Paragraph({
+    Title = "Developer",
+    Desc = "DragonCihuy"
+})
+Home:Paragraph({
+    Title = "DragonCihuy",
+    Desc = "⭐Thanks for using my script on SZA. It's No Key Script⭐\n——————\nScript Executor Support\n-Delta\n-Krnl\n-Fluxus\n-Codex\n—————"
+})
+Home:Paragraph({
+    Title = "Discord",
+    Desc = "https://discord.gg/pKNwBgwn6"
+})
+local Main = Window:Tab({
+    Title = "• Main"
+})
+local Aura = false
+local AuraThread
+Main:Toggle({
+    Title = "Instant Aura Kill",
+    Value = false,
+    Callback = function(v)
+        Aura = v
+        if Aura then
+            AuraThread = task.spawn(function()
+                local P=game:GetService("Players")
+                local R=game:GetService("ReplicatedStorage")
+                local L=P.LocalPlayer
+                local Z=require(L.PlayerScripts.Controllers.ZombieClient).Zombies
+                if type(Z)~="table" then
+	                for _,v in pairs(getgc(true)) do
+		                if type(v)=="table" and rawget(v,"Zombies") and rawget(v,"ZombieModels") then
+			                Z=v.Zombies
+			                break
+		                end
+	                end
+                end
+                local D=R.ZombieRemotes.ZombieDamage
+                local function H()
+	                local M=L.Character and L.Character:FindFirstChildOfClass("Humanoid")
+	                if M then M.HipHeight=0.01 end
+                end
+                H()
+                L.CharacterAdded:Connect(function()
+                    task.wait(1)
+                    H()
+                end)
+                while Aura do
+                    task.wait(.1)
+                    H()
+                    for id,data in pairs(Z) do
+                        if data and not data.IsDying and data.Health > 0 then
+                            D:FireServer(id, math.huge)
+                        end
+                    end
+                end
+            end)
+        end
+    end
+})
+local FastWave = false
+local WavePart
+Main:Toggle({
+    Title = "Fast Clean Waves",
+    Value = false,
+    Callback = function(v)
+        FastWave = v
+        if v then
+            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-1.31, -158.5, 8.49)
+            end
+            WavePart = Instance.new("Part")
+            WavePart.Size = Vector3.new(200,1,200)
+            WavePart.Position = Vector3.new(-1.31,-160.5,8.49)
+            WavePart.Anchored = true
+            WavePart.Transparency = 0.10
+            WavePart.Color = Color3.fromRGB(255,255,255)
+            WavePart.CanCollide = true
+            WavePart.CanTouch = true
+            WavePart.Name = "DragonWavePart"
+            WavePart.Parent = workspace
+        else
+            if WavePart then
+                WavePart:Destroy()
+            end
+            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-241.55,500.05,-358.95)
+            end
+        end
+    end
+})
+local SafeWave = false
+local SafePart
+Main:Toggle({
+    Title = "Safe Wave",
+    Value = false,
+    Callback = function(v)
+        SafeWave = v
+        if v then
+            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-241.55,503.55,-358.95)
+            end
+            SafePart = Instance.new("Part")
+            SafePart.Size = Vector3.new(50,2,50)
+            SafePart.Position = Vector3.new(-241.55,501.55,-358.95)
+            SafePart.Anchored = true
+            SafePart.Transparency = 0.1
+            SafePart.Color = Color3.fromRGB(255,255,255)
+            SafePart.CanCollide = true
+            SafePart.CanTouch = true
+            SafePart.Name = "DragonSafePart"
+            SafePart.Parent = workspace
+        else
+            if SafePart then
+                SafePart:Destroy()
+            end
+        end
+    end
+})
+local Misc = Window:Tab({
+    Title = "• Misc"
+})
+Misc:Toggle({
+    Title = "Anti-Afk",
+    Value = false,
+    Callback = function(v)
+        if v then
+            LocalPlayer.Idled:Connect(function()
+                VirtualUser:CaptureController()
+                VirtualUser:ClickButton2(Vector2.new())
+            end)
+        end
+    end
+})
+local OldBrightness = Lighting.Brightness
+local OldClock = Lighting.ClockTime
+local OldFog = Lighting.FogEnd
+local OldShadow = Lighting.GlobalShadows
+Misc:Toggle({
+    Title = "Full Bright",
+    Value = false,
+    Callback = function(v)
+        if v then
+            Lighting.Brightness = 5
+            Lighting.ClockTime = 12
+            Lighting.FogEnd = 100000
+            Lighting.GlobalShadows = false
+            Lighting.OutdoorAmbient = Color3.fromRGB(255,255,255)
+        else
+            Lighting.Brightness = OldBrightness
+            Lighting.ClockTime = OldClock
+            Lighting.FogEnd = OldFog
+            Lighting.GlobalShadows = OldShadow
+        end
+    end
+})
+Misc:Toggle({
+    Title = "No Fog",
+    Value = false,
+    Callback = function(v)
+        if v then
+            Lighting.FogEnd = 9e9
+        else
+            Lighting.FogEnd = OldFog
+        end
+    end
+})
+Misc:Toggle({
+    Title = "Auto Execute",
+    Value = false,
+    Callback = function(v)
+        if v then
+            StarterGui:SetCore("SendNotification",{
+                Title = "DragonCihuy Hub",
+                Text = "Auto Execute Enabled",
+                Duration = 5
+            })
+        end
+    end
+})
+Misc:Button({
+    Title = "FPS Booster",
+    Callback = function()
+        local Lighting = game:GetService("Lighting")
+        local Terrain = workspace:FindFirstChildOfClass("Terrain")
+        for _,v in pairs(game:GetDescendants()) do
+            if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Smoke") or v:IsA("Fire") or v:IsA("Sparkles") then
+                v.Enabled = false
+            end
+            if v:IsA("Explosion") then
+                v.BlastPressure = 0
+                v.BlastRadius = 0
+            end
+            if v:IsA("BasePart") then
+                v.Material = Enum.Material.Plastic
+                v.Reflectance = 0
+            end
+        end
+        Lighting.GlobalShadows = false
+        Lighting.FogEnd = 9e9
+        Lighting.Brightness = 1
+        settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+        if Terrain then
+            Terrain.WaterWaveSize = 0
+            Terrain.WaterWaveSpeed = 0
+            Terrain.WaterReflectance = 0
+            Terrain.WaterTransparency = 0
+        end
+        for _,v in pairs(game:GetDescendants()) do
+            if v:IsA("Decal") or v:IsA("Texture") then
+                v.Transparency = 1
+            end
+        end
+        print("Anti Lag")
+    end
+})
+local PlayerTab = Window:Tab({
+    Title = "• Local Player"
+})
+local ESPEnabled = false
+local ESPFolder = Instance.new("Folder", game.CoreGui)
+local function CreateESP(plr)
+    if plr == LocalPlayer then return end
+    local Highlight = Instance.new("Highlight")
+    Highlight.Name = plr.Name
+    Highlight.FillTransparency = 0.5
+    Highlight.OutlineTransparency = 0
+    Highlight.Parent = ESPFolder
+    local function Update()
+        if plr.Character then
+            Highlight.Adornee = plr.Character
+            local Hum = plr.Character:FindFirstChildOfClass("Humanoid")
+            if Hum then
+                if Hum.Health <= 0 then
+                    Highlight.FillColor = Color3.fromRGB(255,0,0)
+                else
+                    Highlight.FillColor = Color3.fromRGB(0,255,0)
+                end
+            end
+        end
+    end
+    Update()
+    plr.CharacterAdded:Connect(function()
+        task.wait(1)
+        Update()
+    end)
+    RunService.RenderStepped:Connect(Update)
 end
-L.CharacterAdded:Connect(function()
-	task.wait(1)
-	if FarmActive then H() end
+PlayerTab:Toggle({
+    Title = "Esp Player",
+    Value = false,
+    Callback = function(v)
+        ESPEnabled = v
+        if v then
+            for _,p in pairs(Players:GetPlayers()) do
+                CreateESP(p)
+            end
+        else
+            ESPFolder:ClearAllChildren()
+        end
+    end
+})
+local InfJump = false
+PlayerTab:Toggle({
+    Title = "InfJump",
+    Value = false,
+    Callback = function(v)
+        InfJump = v
+    end
+})
+UIS.JumpRequest:Connect(function()
+    if InfJump then
+        local Hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if Hum then
+            Hum:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
 end)
-
-MainTab:CreateToggle({
-	Name = "Farm Instant Aura Kill",
-	CurrentValue = false,
-	Callback = function(Value)
-		FarmActive = Value
-		if FarmActive then
-			H()
-			task.spawn(function()
-				local Z = require(L.PlayerScripts.Controllers.ZombieClient).Zombies
-				if type(Z) ~= "table" then
-					for _, v in pairs(getgc(true)) do
-						if type(v) == "table" and rawget(v, "Zombies") and rawget(v, "ZombieModels") then
-							Z = v.Zombies
-							break
-						end
-					end
-				end
-				local D = R.ZombieRemotes.ZombieDamage
-				while FarmActive and task.wait(.2) do
-					H()
-					for id, data in pairs(Z) do
-						if data and not data.IsDying and data.Health > 0 then
-							D:FireServer(id, math.huge)
-						end
-					end
-				end
-			end)
-		else
-			local M = L.Character and L.Character:FindFirstChildOfClass("Humanoid")
-			if M then M.HipHeight = 0 end
-		end
-	end
+local Noclip = false
+PlayerTab:Toggle({
+    Title = "Noclip",
+    Value = false,
+    Callback = function(v)
+        Noclip = v
+    end
 })
-
-MainTab:CreateToggle({
-	Name = "Fast Cleanerd Waves",
-	CurrentValue = false,
-	Callback = function(Value)
-		FastCleanActive = Value
-		if FastCleanActive then
-			if L.Character and L.Character:FindFirstChild("HumanoidRootPart") then
-				L.Character.HumanoidRootPart.CFrame = CFrame.new(-1.31, -160.5, 8.49)
-			end
-			local p = Instance.new("Part")
-			p.Name = "CleanPart"
-			p.Size = Vector3.new(98, 1, 97)
-			p.Position = Vector3.new(-1.31, -160.5, 8.49)
-			p.Color = Color3.new(1, 1, 1)
-			p.Transparency = -10
-			p.Anchored = true
-			p.Parent = workspace
-		else
-			local p = workspace:FindFirstChild("CleanPart")
-			if p then p:Destroy() end
-			if L.Character and L.Character:FindFirstChild("HumanoidRootPart") then
-				L.Character.HumanoidRootPart.CFrame = CFrame.new(-241.55, 501.05, -358.95)
-			end
-		end
-	end
+RunService.Stepped:Connect(function()
+    if Noclip and LocalPlayer.Character then
+        for _,v in pairs(LocalPlayer.Character:GetDescendants()) do
+            if v:IsA("BasePart") then
+                v.CanCollide = false
+            end
+        end
+    end
+end)
+local WS = 16
+local WSLoop = false
+PlayerTab:Toggle({
+    Title = "WalkSpeed",
+    Value = false,
+    Callback = function(v)
+        WSLoop = v
+    end
 })
-
-MainTab:CreateLabel("Takut Ketahuan Is Meaning : Afraid of Being Caught")
-
-MainTab:CreateToggle({
-	Name = "Takut Ketahuan?",
-	CurrentValue = false,
-	Callback = function(Value)
-		TakutActive = Value
-		if L.Character and L.Character:FindFirstChild("HumanoidRootPart") then
-			if TakutActive then
-				L.Character.HumanoidRootPart.CFrame = CFrame.new(-241.55, 610.55, -358.95)
-			else
-				L.Character.HumanoidRootPart.CFrame = CFrame.new(-241.55, 501.05, -358.95)
-			end
-		end
-	end
+PlayerTab:Slider({
+    Title = "Set WalkSpeed",
+    Step = 1,
+    Value = {
+        Min = 1,
+        Max = 1000,
+        Default = 16,
+    },
+    Callback = function(v)
+        WS = v
+    end
 })
-
-MiscTab:CreateToggle({
-	Name = "Anti-Afk",
-	CurrentValue = false,
-	Callback = function(Value)
-		AntiAfkActive = Value
-		if AntiAfkActive then
-			L.Idled:Connect(function()
-				if AntiAfkActive then
-					VU:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
-					task.wait(1)
-					VU:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
-				end
-			end)
-		end
-	end
+RunService.RenderStepped:Connect(function()
+    if WSLoop then
+        local Hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if Hum then
+            Hum.WalkSpeed = WS
+        end
+    end
+end)
+local JP = 50
+local JPLoop = false
+PlayerTab:Toggle({
+    Title = "Jumppower",
+    Value = false,
+    Callback = function(v)
+        JPLoop = v
+    end
 })
-
-local OrigBright = LP.Brightness
-local OrigShadow = LP.GlobalShadows
-local OrigTime = LP.ClockTime
-MiscTab:CreateToggle({
-	Name = "Full Bright",
-	CurrentValue = false,
-	Callback = function(Value)
-		if Value then
-			LP.Brightness = 2
-			LP.GlobalShadows = false
-			LP.ClockTime = 14
-		else
-			LP.Brightness = OrigBright
-			LP.GlobalShadows = OrigShadow
-			LP.ClockTime = OrigTime
-		end
-	end
+PlayerTab:Slider({
+    Title = "Set Jumppower",
+    Step = 1,
+    Value = {
+        Min = 50,
+        Max = 1000,
+        Default = 50,
+    },
+    Callback = function(v)
+        JP = v
+    end
 })
-
-local OrigFog = LP.FogEnd
-MiscTab:CreateToggle({
-	Name = "No Fog",
-	CurrentValue = false,
-	Callback = function(Value)
-		if Value then
-			LP.FogEnd = 999999
-		else
-			LP.FogEnd = OrigFog
-		end
-	end
+RunService.RenderStepped:Connect(function()
+    if JPLoop then
+        local Hum = LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if Hum then
+            Hum.UseJumpPower = true
+            Hum.JumpPower = JP
+        end
+    end
+end)
+local Discord = Window:Tab({
+    Title = "• Discord"
 })
-
-MiscTab:CreateToggle({
-	Name = "Noclip",
-	CurrentValue = false,
-	Callback = function(Value)
-		NoclipActive = Value
-		game:GetService("RunService").Stepped:Connect(function()
-			if NoclipActive and L.Character then
-				for _, v in pairs(L.Character:GetChildren()) do
-					if v:IsA("BasePart") then v.CanCollide = false end
-				end
-			end
-		end)
-	end
+Discord:Button({
+    Title = "Link Discord",
+    Callback = function()
+        setclipboard("https://discord.gg/pKNwBgwn6")
+        StarterGui:SetCore("SendNotification",{
+            Title = "DragonCihuy Hub",
+            Text = "Discord Link Copied!",
+            Duration = 5
+        })
+    end
 })
-
-MiscTab:CreateToggle({
-	Name = "FPS Booster",
-	CurrentValue = false,
-	Callback = function(Value)
-		if Value then
-			for _, v in pairs(workspace:GetDescendants()) do
-				if v:IsA("PostEffect") or v:IsA("Explosion") or v:IsA("Sparkles") then
-					v.Enabled = false
-				elseif v:IsA("Decal") or v:IsA("Texture") then
-					v:Destroy()
-				end
-			end
-		end
-	end
+Discord:Paragraph({
+    Title = "DragonCihuy",
+    Desc = "Don't Forget to Join Later will Add My Script.\n\nJangan Lupa Bergabung Discord Saya Akan Tambahin Script."
 })
-
-local ESPs = {}
-LPTab:CreateToggle({
-	Name = "Esp Player",
-	CurrentValue = false,
-	Callback = function(Value)
-		if Value then
-			for _, p in pairs(P:GetPlayers()) do
-				if p ~= L and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-					local b = Instance.new("BillboardGui", p.Character.HumanoidRootPart)
-					b.Size = UDim2.new(0, 200, 0, 50)
-					b.AlwaysOnTop = true
-					b.ExtentsOffset = Vector3.new(0, 3, 0)
-					local t = Instance.new("TextLabel", b)
-					t.Size = UDim2.new(1, 0, 1, 0)
-					t.BackgroundTransparency = 1
-					t.TextColor3 = Color3.new(1, 1, 1)
-					t.TextStrokeTransparency = 0
-					table.insert(ESPs, b)
-					task.spawn(function()
-						while Value and p.Character and p.Character:FindFirstChild("Humanoid") do
-							t.Text = p.Name .. " [" .. math.floor(p.Character.Humanoid.Health) .. "]"
-							task.wait(0.5)
-						end
-					end)
-				end
-			end
-		else
-			for _, v in pairs(ESPs) do if v then v:Destroy() end end
-			ESPs = {}
-		end
-	end
-})
-
-LPTab:CreateToggle({
-	Name = "InfJump",
-	CurrentValue = false,
-	Callback = function(Value)
-		InfJumpActive = Value
-		game:GetService("UserInputService").JumpRequest:Connect(function()
-			if InfJumpActive and L.Character and L.Character:FindFirstChildOfClass("Humanoid") then
-				L.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
-			end
-		end)
-	end
-})
-
-LPTab:CreateToggle({
-	Name = "WalkSpeed",
-	CurrentValue = false,
-	Callback = function(Value)
-		WalkActive = Value
-		task.spawn(function()
-			while WalkActive and task.wait() do
-				if L.Character and L.Character:FindFirstChildOfClass("Humanoid") then
-					L.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = WSValue
-				end
-			end
-			if not WalkActive and L.Character and L.Character:FindFirstChildOfClass("Humanoid") then
-				L.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = 16
-			end
-		end)
-	end
-})
-
-LPTab:CreateSlider({
-	Name = "Set WalkSpeed",
-	Range = {1, 1000},
-	Increment = 1,
-	CurrentValue = 16,
-	Callback = function(Value)
-		WSValue = Value
-	end
-})
-
-LPTab:CreateToggle({
-	Name = "Jumppower",
-	CurrentValue = false,
-	Callback = function(Value)
-		JumpActive = Value
-		task.spawn(function()
-			while JumpActive and task.wait() do
-				if L.Character and L.Character:FindFirstChildOfClass("Humanoid") then
-					L.Character:FindFirstChildOfClass("Humanoid").UseJumpPower = true
-					L.Character:FindFirstChildOfClass("Humanoid").JumpPower = JPValue
-				end
-			end
-			if not JumpActive and L.Character and L.Character:FindFirstChildOfClass("Humanoid") then
-				L.Character:FindFirstChildOfClass("Humanoid").JumpPower = 50
-			end
-		end)
-	end
-})
-
-LPTab:CreateSlider({
-	Name = "Set Jumppower",
-	Range = {50, 1000},
-	Increment = 1,
-	CurrentValue = 50,
-	Callback = function(Value)
-		JPValue = Value
-	end
-})
-
-DiscTab:CreateButton({
-	Name = "Discord",
-	Callback = function()
-		setclipboard("https://discord.gg/pKNwBgwn6")
-		Rayfield:Notify({
-			Title = "Copied",
-			Content = "Link Discord berhasil disalin!",
-			Duration = 3,
-			Image = 4483362458,
-		})
-	end
-})
-
-DiscTab:CreateLabel("Don't Forget to Join Later will Add My Script.")
-DiscTab:CreateLabel("Jangan Lupa Bergabung Discord Saya Akan Tambahin Script.")
